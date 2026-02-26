@@ -6,7 +6,6 @@ import com.jesper.seckill.redis.GoodsKey;
 import com.jesper.seckill.redis.RedisService;
 import com.jesper.seckill.result.Result;
 import com.jesper.seckill.service.GoodsService;
-import com.jesper.seckill.service.UserService;
 import com.jesper.seckill.vo.GoodsDetailVo;
 import com.jesper.seckill.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.thymeleaf.context.WebContext;
-import org.springframework.context.ApplicationContext;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,16 +29,10 @@ import java.util.List;
 public class GoodsController {
 
     @Autowired
-    UserService userService;
-
-    @Autowired
     RedisService redisService;
 
     @Autowired
     GoodsService goodsService;
-
-    @Autowired
-    ApplicationContext applicationContext;
 
     @Autowired
     ThymeleafViewResolver thymeleafViewResolver;
@@ -81,7 +73,8 @@ public class GoodsController {
      */
     @RequestMapping(value = "/to_detail2/{goodsId}", produces = "text/html")
     @ResponseBody
-    public String detail2(HttpServletRequest request, HttpServletResponse response, Model model, User user, @PathVariable("goodsId") long goodsId) {
+    public String detail2(HttpServletRequest request, HttpServletResponse response, Model model, User user,
+                          @PathVariable("goodsId") long goodsId) {
         model.addAttribute("user", user);
 
         //取缓存
@@ -129,7 +122,8 @@ public class GoodsController {
      */
     @RequestMapping(value = "/detail/{goodsId}")
     @ResponseBody
-    public Result<GoodsDetailVo> detail(HttpServletRequest request, HttpServletResponse response, Model model, User user, @PathVariable("goodsId") long goodsId) {
+    public Result<GoodsDetailVo> detail(HttpServletRequest request, HttpServletResponse response, Model model,
+                                        User user, @PathVariable("goodsId") long goodsId) {
 
         //根据id查询商品详情
         GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
