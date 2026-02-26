@@ -10,7 +10,8 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.8.RELEASE</version>
+		<version>2.7.18</version>
+		<relativePath/>
 	</parent>
 
 	<name>jesper_seckill</name>
@@ -18,48 +19,77 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version> <!-- 明确 Java 版本（秒杀系统常用 1.8） -->
+		<!-- 统一管理第三方依赖版本 -->
+		<mybatis.version>2.3.0</mybatis.version>
+		<druid.version>1.2.18</druid.version>
+		<fastjson.version>2.0.42</fastjson.version>
+		<guava.version>32.1.3-jre</guava.version>
+		<spring-boot.version>2.7.18</spring-boot.version>
 	</properties>
 
 	<dependencies>
-
+		<!-- Web 核心 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<!-- 模板引擎（按需保留） -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 
+		<!-- MyBatis（升级为最新兼容版本） -->
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter</artifactId>
-			<version>1.3.1</version>
+			<version>${mybatis.version}</version>
 		</dependency>
 
+		<!-- MySQL 驱动（Spring Boot 2.7.x 适配 8.x） -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.33</version>
+			<scope>runtime</scope> <!-- 运行时依赖，编译无需 -->
 		</dependency>
 
+		<!-- Druid 连接池（升级安全版本） -->
 		<dependency>
 			<groupId>com.alibaba</groupId>
-			<artifactId>druid</artifactId>
-			<version>1.0.5</version>
+			<artifactId>druid-spring-boot-starter</artifactId> <!-- 推荐用 starter 整合 Spring Boot -->
+			<version>${druid.version}</version>
 		</dependency>
 
+		<!-- Redis（Spring Boot 官方整合，替代原生 Jedis） -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+			<!-- 排除默认的 Lettuce，改用 Jedis（如需） -->
+			<exclusions>
+				<exclusion>
+					<groupId>io.lettuce</groupId>
+					<artifactId>lettuce-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
+			<version>3.9.0</version>
 		</dependency>
 
+		<!-- FastJSON（升级无漏洞版本） -->
 		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>fastjson</artifactId>
-			<version>1.2.38</version>
+			<groupId>com.alibaba.fastjson2</groupId>
+			<artifactId>fastjson2</artifactId>
+			<version>${fastjson.version}</version>
 		</dependency>
 
+		<!-- Apache 工具类（去重） -->
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
@@ -67,36 +97,33 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.6</version>
 		</dependency>
 
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.6</version>
-		</dependency>
-
+		<!-- 参数校验 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 
+		<!-- RabbitMQ 消息队列 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-amqp</artifactId>
 		</dependency>
 
+		<!-- Google Guava（升级最新版） -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>19.0</version>
+			<version>${guava.version}</version>
 		</dependency>
 
-
+		<!-- 测试依赖（建议添加） -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -105,6 +132,26 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<!-- 显式指定版本，避免冲突 -->
+				<version>${spring-boot.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal> <!-- 强制打包为可执行 Jar -->
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- 编译插件（指定 Java 版本） -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
