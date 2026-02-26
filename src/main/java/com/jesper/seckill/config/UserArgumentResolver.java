@@ -5,7 +5,7 @@ import com.jesper.seckill.bean.User;
 import com.jesper.seckill.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -17,12 +17,13 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by jiangyunxiong on 2018/5/22.
+ * Modified by Zemba on 2026/2/26.
  */
-@Service
+@Component
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     /**
      * 当参数类型为User才做处理
@@ -47,6 +48,9 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
             throws Exception {
         HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
         HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
+        if (request == null || response == null) {
+            return null;
+        }
 
         String paramToken = request.getParameter(UserService.COOKIE_NAME_TOKEN);
         String cookieToken = getCookieValue(request, UserService.COOKIE_NAME_TOKEN);
